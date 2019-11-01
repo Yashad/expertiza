@@ -23,7 +23,9 @@
             return !document[stateKey];
         }
     })();
+
     jQuery(document).ready(function() {
+
         //use barrating for dropdown
         $('.review-rating').each(function(index, el) {
             var $El;
@@ -34,6 +36,7 @@
                 showSelectedRating: true
             });
         });
+
         // auto save every changes to local storage
         $(function(){
             $("form").sisyphus({
@@ -41,6 +44,7 @@
                 autoRelease: true
             });
         });
+
         // Server AUTO SAVE: triggers every 60 seconds to save the draft version of the review to database
         var interval = 60000;
         var last_save = new Date();
@@ -48,12 +52,16 @@
         var idleTime = 0;
         //threshold to turn off the autosave
         var maxIdleTime = 30;
+
         $('#autosave_cbx_lbl').html("&nbsp;Auto save your response every " + interval / 1000 + " seconds?&nbsp;&nbsp;");
+
         //if it's was in the background, don't auto save to avoid conflict
         setInterval(function() {
             if(vis() && $("#autosave_cbx").prop("checked"))
                 executeSave();
         }, interval);
+
+
         //click ajax
         function executeSave(){
             timeDiff = (new Date().getTime() - last_save.getTime())/1000;
@@ -66,10 +74,12 @@
                     $('input[name=saved]').val("1");
                 $('form').removeAttr('data-remote');
             }
+
             $(document).ajaxError(function(event, request, settings) {
                 if (settings.url.includes("response") && settings.type == "POST")
                     $('#save_progress').html('<span id="tick"> &#9940; </span>' + 'Unable to reach the expertiza server. <br>Create a backup of your comments and you may try to login again in a while');
             })
+
             $('form#<%=@modified_object%>').bind('ajax:success', function(evt, data, status, xhr){
                 $('#save_progress').html('<span id="tick"> &#10004; </span>' +
                     'A draft was saved on ' + last_save.toLocaleString('en-US', {
@@ -83,6 +93,7 @@
                         hour12: true }));
             });
         }
+
         $('#save_review').click(function(){
             $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!')
             setTimeout(function(){
@@ -165,6 +176,7 @@
                 removeOverlay();
             });
         }
+
         // update the form after it's back to the foreground.
         // save review when the window is sent to background
         vis(function () {
@@ -202,6 +214,7 @@
         function removeOverlay() {
             $("#overlay").remove();
         }
+
         //Increment the idle time counter every minute and restart the timer if there is a mouse movement or keypress.
         var idleInterval = setInterval(function(){
             idleTime = idleTime + 1;
@@ -230,12 +243,14 @@
                 idleTime = 0;
         });
         /// end auto reload
+
         //attach event handler to all tinymce editors
         tinyMCE.on('AddEditor', function(e) {
             e.editor.on('blur', function (e) {
                 ed = e.target;
                 if (ed.id.includes("comments")){
                     json_review = JSON.stringify({ "review": ed.getContent({format : 'text'}) })
+
                     $.ajax({
                         url: "http://peerlogic.csc.ncsu.edu/sentiment/visualize_sentiment",
                         type: "POST",
@@ -260,6 +275,7 @@
                 }
             });
         });
+
     });
 </script>
 
